@@ -24,7 +24,7 @@ function Login() {
     const handleLogin = async () => {
         setLoading(true)
         try {
-            const result = await axios.post(serverUrl + "/api/auth/login" , {email , password} ,{withCredentials:true})
+            const result = await axios.post("https://lms-final-backend-host.vercel.app" + "/api/auth/login" , {email , password} ,{withCredentials:true})
             dispatch(setUserData(result.data))
             navigate("/")
             setLoading(false)
