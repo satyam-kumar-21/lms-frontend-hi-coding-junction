@@ -21,6 +21,16 @@ function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // ---------------- FETCH CURRENT USER ----------------
+  const fetchCurrentUser = async () => {
+    try {
+      const { data } = await axios.get(`${serverUrl}/api/user/current`, { withCredentials: true });
+      dispatch(setUserData(data));
+    } catch (err) {
+      console.log("Fetch current user error:", err);
+    }
+  };
+
   // ---------------- LOGIN ----------------
   const handleLogin = async () => {
     if (!email || !password) {
@@ -30,13 +40,15 @@ function Login() {
 
     setLoading(true);
     try {
-      const result = await axios.post(
+      await axios.post(
         `${serverUrl}/api/auth/login`,
         { email, password },
-        { withCredentials: true } // ✅ Cross-domain cookie
+        { withCredentials: true }
       );
 
-      dispatch(setUserData(result.data));
+      // ✅ Immediately fetch user data after login
+      await fetchCurrentUser();
+
       navigate("/");
       toast.success("Login Successfully");
     } catch (error) {
@@ -57,13 +69,15 @@ function Login() {
       const email = user.email;
       const role = ""; // default role
 
-      const result = await axios.post(
+      await axios.post(
         `${serverUrl}/api/auth/googlesignup`,
         { name, email, role },
-        { withCredentials: true } // ✅ Cross-domain cookie
+        { withCredentials: true }
       );
 
-      dispatch(setUserData(result.data));
+      // ✅ Immediately fetch user data after Google login
+      await fetchCurrentUser();
+
       navigate("/");
       toast.success("Login Successfully");
     } catch (error) {

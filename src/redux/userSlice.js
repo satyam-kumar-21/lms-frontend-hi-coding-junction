@@ -3,33 +3,14 @@ import { createSlice } from "@reduxjs/toolkit"
 const userSlice = createSlice({
     name: "user",
     initialState: {
-        userData: {
-            _id: "",
-            name: "",
-            email: "",
-            role: "",
-            photoUrl: "",
-            description: "",
-            enrolledCourses: [] // 🔥 IMPORTANT
-        }
-    },
+        userData: null
+    }, //setUserData("ankush")<={payload}
     reducers: {
         setUserData: (state, action) => {
             state.userData = action.payload
-        },
-        logoutUser: (state) => {
-            state.userData = {
-                _id: "",
-                name: "",
-                email: "",
-                role: "",
-                photoUrl: "",
-                description: "",
-                enrolledCourses: []
-            }
         }
     }
 })
 
-export const { setUserData, logoutUser } = userSlice.actions
+export const { setUserData } = userSlice.actions
 export default userSlice.reducer
