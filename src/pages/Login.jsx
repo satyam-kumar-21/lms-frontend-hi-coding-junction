@@ -21,6 +21,16 @@ function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // ---------------- FETCH CURRENT USER ----------------
+  const fetchCurrentUser = async () => {
+    try {
+      const res = await axios.get(`${serverUrl}/api/user/currentuser`, { withCredentials: true });
+      dispatch(setUserData(res.data));
+    } catch (err) {
+      console.log("Fetch current user error:", err);
+    }
+  };
+
   // ---------------- LOGIN ----------------
   const handleLogin = async () => {
     if (!email || !password) {
@@ -36,7 +46,12 @@ function Login() {
         { withCredentials: true } // ✅ Cross-domain cookie
       );
 
+      // first set partial login data
       dispatch(setUserData(result.data));
+
+      // fetch full user data (enrolledCourses, etc)
+      await fetchCurrentUser();
+
       navigate("/");
       toast.success("Login Successfully");
     } catch (error) {
@@ -64,6 +79,10 @@ function Login() {
       );
 
       dispatch(setUserData(result.data));
+
+      // fetch full user data after Google login
+      await fetchCurrentUser();
+
       navigate("/");
       toast.success("Login Successfully");
     } catch (error) {

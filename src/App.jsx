@@ -28,6 +28,8 @@ import getAllReviews from './customHooks/getAllReviews'
 
 export const serverUrl = "https://lms-final-backend-host.vercel.app"
 
+// export const serverUrl = "http://localhost:8000"
+
 function App() {
   
   let {userData} = useSelector(state=>state.user)
