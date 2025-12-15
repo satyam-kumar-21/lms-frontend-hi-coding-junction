@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { FaArrowLeftLong } from "react-icons/fa6";
 
 function Profile() {
-  let {userData} = useSelector(state=>state.user.userData)
+  let {userData} = useSelector(state=>state.user)
   let navigate = useNavigate()
   return (
     <div className="min-h-screen bg-gray-100 px-4 py-10 flex items-center justify-center ">
