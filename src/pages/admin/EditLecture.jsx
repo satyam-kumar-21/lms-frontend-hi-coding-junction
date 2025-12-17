@@ -30,39 +30,66 @@ function EditLecture() {
       return toast.error("Lecture title required")
     }
 
-    if (!videoFile) {
-      return toast.error("Please select a video")
-    }
-
-
-    const formData = new FormData()
-    formData.append("lectureTitle", lectureTitle)
-    formData.append("videoUrl", videoFile)
-    formData.append("isPreviewFree", isPreviewFree)
-
-
+    // if (!videoFile) {
+    //   return toast.error("Please select a video")
+    // }
 
     setLoading(true)
 
     try {
+      let videoUrl;
+
+      if (videoFile) {
+        // 1. Get Signature from Backend
+        const { data: { signature, timestamp, cloud_name, api_key } } = await axios.get(
+          `${serverUrl}/api/course/get-signature`,
+          { withCredentials: true }
+        );
+
+        // 2. Upload to Cloudinary directly
+        const cloudinaryData = new FormData();
+        cloudinaryData.append("file", videoFile);
+        cloudinaryData.append("api_key", api_key);
+        cloudinaryData.append("timestamp", timestamp);
+        cloudinaryData.append("signature", signature);
+        cloudinaryData.append("folder", "courses");
+        cloudinaryData.append("resource_type", "video");
+
+        const uploadRes = await axios.post(
+          `https://api.cloudinary.com/v1_1/${cloud_name}/video/upload`,
+          cloudinaryData,
+          {
+            onUploadProgress: (progressEvent) => {
+              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              console.log(`Upload Progress: ${percentCompleted}%`);
+              // You can add a progress bar state here if you want
+            }
+          }
+        );
+
+        videoUrl = uploadRes.data.secure_url;
+      }
+
+      // 3. Send URL to Backend
       const res = await axios.post(
         `${serverUrl}/api/course/editlecture/${lectureId}`,
-        formData,
-       
+        {
+          lectureTitle,
+          isPreviewFree,
+          videoUrl // Send URL if new video uploaded, else backend keeps old one (if we didn't force it)
+        },
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json", // Send JSON now
           },
+          withCredentials: true
         }
       );
-
-
-
 
       console.log("res", res)
 
       dispatch(setLectureData(res.data))
-      toast.success("Lecture Updated")
+      toast.success(res.data.message || "Lecture Updated")
       navigate("/courses")
 
     } catch (err) {
