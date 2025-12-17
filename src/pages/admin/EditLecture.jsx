@@ -48,10 +48,14 @@ function EditLecture() {
       const res = await axios.post(
         `${serverUrl}/api/course/editlecture/${lectureId}`,
         formData,
+       
         {
-          withCredentials: true // ✅ bas itna hi
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
+
 
 
 
